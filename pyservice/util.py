@@ -39,38 +39,29 @@ def graceful_exit(shutdown_time):
   If the function terminates in the given time frame, the program will
   exit with code 0.
   """
-  # Set up the killer_thread. The thread sleeps for shutdown_time
-  # seconds and then sends a kill signal.
   _signal.signal(_signal.SIGUSR1, lambda s,f: exit(1))
   pid = _os.getpid()
   def killer_thread():
     _time.sleep(shutdown_time)
     _os.kill(pid, _signal.SIGUSR1)
-  def start_killer_thread(sigFlag = None):
-    # When the killer_thread is started it sets an event sigFlag to True
-    # to not lose the original SIGTERM _signal.
-    if sigFlag:
-      sigFlag.set()
-    thread = _threading.Thread(target = killer_thread)
+  def start_killer_thread(sigTermFlag):
+    sigTermFlag.set()
+    thread = _threading.Thread(target=killer_thread)
     thread.daemon = True
     thread.start()
 
   def decorator(fun):
     @_functools.wraps(fun)
-    def timeout_function(*args, **kwargs):
-      # Store the original signalhandler for SIGTERM and set the killer_thread
-      # as the new signalhandler.
+    def finishing_fun(*args, **kwargs):
       original_sigTerm = _signal.getsignal(_signal.SIGTERM)
-      caughtSignal = _threading.Event()
-      _signal.signal(_signal.SIGTERM, lambda s,f: start_killer_thread(caughtSignal))
+      sigTermFlag = _threading.Event()
+      _signal.signal(_signal.SIGTERM, lambda s,f: start_killer_thread(sigTermFlag))
       res = fun(*args, **kwargs)
-      # After execution, reset the signal handler and check if SIGTERM has been
-      # caught.
-      _signal.signal(_signal.SIGTERM, original_sigTerm) # reset signal handler
-      if caughtSignal.is_set():
+      _signal.signal(_signal.SIGTERM, original_sigTerm)
+      if sigTermFlag.is_set():
         exit(0)
       return res
-    return timeout_function
+    return finishing_fun
   return decorator
 
 def first_index(ls, cond):
