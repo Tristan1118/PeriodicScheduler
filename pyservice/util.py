@@ -30,7 +30,8 @@ def read_lines(filePath):
   return lines
 
 def graceful_exit(shutdown_time):
-  """Return a decorator function. Functions decorated with it
+  """
+  Return a decorator function. Functions decorated with it
   will continue to execute for `shutdown_time` seconds when
   the program is stopped with SIGTERM.
   After that it will be killed with SIGUSR1 and the program will
