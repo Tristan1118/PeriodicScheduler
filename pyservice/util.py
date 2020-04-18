@@ -66,7 +66,7 @@ def graceful_exit(shutdown_time):
       # After execution, reset the signal handler and check if SIGTERM has been
       # caught.
       _signal.signal(_signal.SIGTERM, original_sigTerm) # reset signal handler
-      if caught_Signal.is_set():
+      if caughtSignal.is_set():
         exit(0)
       return res
     return timeout_function
