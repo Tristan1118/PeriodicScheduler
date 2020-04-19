@@ -1,5 +1,6 @@
 import time as _time
 import sched as _sched
+import sys
 
 from . import util
 
@@ -78,9 +79,9 @@ class PeriodicScheduler(_sched.scheduler):
       self._delay_event(self.queue[ind], delay)
       return True
 
-    next_delay = minDelay - (self.queue[ind+1] - (self.queue[ind] + delay))
-    next_delay = 0 if next_delay < 0 else next_delay
-    self._push_event(ind+1, next_delay)
+    nextDelay = self._minDelay - (self.queue[ind+1].time - (self.queue[ind].time + delay))
+    nextDelay = 0 if nextDelay < 0 else nextDelay
+    self._push_event(ind+1, nextDelay)
 
     self._delay_event(self.queue[ind], delay)
     return True
