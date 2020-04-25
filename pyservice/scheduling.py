@@ -122,7 +122,6 @@ class PeriodicScheduler(_sched.scheduler):
       return True
     nextEventTime = self.queue[0].time
     delay = nextEventTime - self.timefunc()
-    delay = 0 if delay < 0 else delay
     # Compare with unbuffered minDelay to compensate for the fact
     # that the check is done after the event is popped off the queue.
     if delay < self.minDelay:
