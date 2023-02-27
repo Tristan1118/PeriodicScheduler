@@ -1,2 +1,2 @@
 # PyService
-wth is this
+wth is this. Just use cron
